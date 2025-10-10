@@ -1,5 +1,6 @@
 // ===================================================
 // script.js - الكود النهائي الموحد
+// التصميم الأخير: تركيز احترافي على تفاصيل الجرد
 // ===================================================
 
 // يرجى تحديث هذا الرابط برابط Web App الخاص بك في Google Apps Script
@@ -70,7 +71,7 @@ async function fillSelects() {
 
     const salesRepSelect = document.getElementById('salesRep');
     salesReps.forEach(repName => salesRepSelect.options.add(new Option(repName, repName)));
-    
+
     const governorateSelect = document.getElementById('governorate');
     governorates.forEach(govName => governorateSelect.options.add(new Option(govName, govName)));
 
@@ -80,7 +81,7 @@ async function fillSelects() {
         opt.value = cust.Customer_Name_AR; 
         customersList.appendChild(opt);
     });
-    
+
     let productsListDatalist = document.getElementById('productsList');
     if (!productsListDatalist) {
         productsListDatalist = document.createElement('datalist');
@@ -108,14 +109,14 @@ function recordStartTimeOnce(e) {
     if (!e.target.classList.contains('product-name-input')) {
         return; 
     }
-    
+
     const visitTimeInput = document.getElementById('visit_time');
-    
+
     // إذا كان وقت الدخول قد سُجل بالفعل، نتجاهل الأمر
     if (visitTimeInput.value) {
         return; 
     }
-    
+
     const now = new Date();
     document.getElementById('visit_time').value = formatTime(now);
     document.getElementById('visit_date').value = formatDate(now);
@@ -154,7 +155,7 @@ function addProductCard(cloneData = null) {
     const productCard = document.createElement('div');
     productCard.className = 'col-12 col-md-6 product-card';
     productCard.id = `productCard-${productCounter}`;
-    
+
     // كود بطاقة المنتج (مع زر الإضافة ونموذج الكميات النظيف)
     productCard.innerHTML = `
         <div class="card shadow-sm mb-3">
@@ -204,7 +205,7 @@ function addProductCard(cloneData = null) {
             </div>
         </div>
     `;
-    
+
     productsBody.appendChild(productCard);
     updateSummary();
 }
@@ -235,7 +236,7 @@ function handleProductSelection(inputElement) {
 
     const card = inputElement.closest('.product-card');
     if (!card) return;
-    
+
     const codeInput = card.querySelector('.product-code');
     const categoryInput = card.querySelector('.product-category');
     const infoDisplay = card.querySelector('.product-info-display');
@@ -271,7 +272,7 @@ function filterProducts() {
 // دوال التحقق والإرسال 
 function validateForm() {
     const form = document.getElementById('inventoryForm');
-    
+
     // 1. التحقق من حقول النموذج الأساسية المرئية
     if (!form.checkValidity()) {
         form.reportValidity();
@@ -281,7 +282,6 @@ function validateForm() {
     // 2. التحقق من الحقول المخفية التي يجب أن تكون معبأة آلياً (التاريخ والوقت وكود العميل)
     const visitDate = document.getElementById('visit_date').value;
     const visitTime = document.getElementById('visit_time').value;
-    const exitTime = document.getElementById('exit_time').value;
     const customerCode = document.getElementById('customer_code').value;
 
     // تم تعديل هذا الشرط: إذا كان visitTime فارغاً، فهذا يعني أن المندوب لم يبدأ العمل
@@ -289,12 +289,12 @@ function validateForm() {
         showMsg("يرجى البدء بكتابة اسم المنتج لتسجيل وقت الدخول قبل الإرسال!", true);
         return false;
     }
-    
+
     if (!customerCode) {
         showMsg("يرجى اختيار العميل لتعبئة كود العميل تلقائياً!", true);
         return false;
     }
-    
+
     // 3. التحقق من منتجات الجرد
     const productCards = document.querySelectorAll('#productsBody .product-card');
     if (productCards.length === 0) {
@@ -307,7 +307,7 @@ function validateForm() {
         const prodCode = card.querySelector('.product-code').value;
         const carton = parseInt(card.querySelector('.product-cases').value) || 0;
         const packet = parseInt(card.querySelector('.product-units').value) || 0;
-        
+
         if (!prodCode) {
             showMsg(`خطأ في بطاقة المنتج ${index + 1}: يرجى اختيار اسم المنتج والكود (بالبحث الذكي).`, true);
             allProductsValid = false;
@@ -332,11 +332,11 @@ function collectRows() {
             commonData[key] = val;
         }
     }
-    
+
     const resultRows = [];
     document.getElementById('productsBody').querySelectorAll('.product-card').forEach(productCard => {
         if (productCard.style.display === 'none') return;
-        
+
         const row = { ...commonData }; 
         row.product_name = productCard.querySelector('.product-name-input').value;
         row.product_code = productCard.querySelector('.product-code').value;
@@ -344,10 +344,10 @@ function collectRows() {
         row.carton_qty = productCard.querySelector('.product-cases').value || "0";
         row.packet_qty = productCard.querySelector('.product-units').value || "0";
         row.expiry_date = productCard.querySelector('.prod-expiry').value;
-        
+
         resultRows.push(row);
     });
-    
+
     return resultRows;
 }
 
@@ -371,7 +371,7 @@ async function sendRows(rows) {
                 headers: { "Content-Type": "application/x-www-form-urlencoded" },
                 body: formBody,
             });
-            
+
             const txt = await res.text();
 
             if (res.ok && (txt.includes("تم إرسال البيانات") || txt.includes("✅"))) {
@@ -395,16 +395,16 @@ async function sendRows(rows) {
         document.getElementById('productsBody').innerHTML = "";
         document.getElementById('customer_code').value = ''; 
         addProductCard(); 
-        
+
         // إعادة تهيئة الحقول الزمنية (فارغة للمهمة التالية)
         document.getElementById('visit_time').value = '';
         document.getElementById('visit_date').value = '';
         document.getElementById('exit_time').value = '';
-        
+
         // إعادة ربط مستمع وقت البدء للمهمة الجديدة
         const productsBody = document.getElementById('productsBody');
         productsBody.addEventListener('input', recordStartTimeOnce);
-        
+
     } else if (success > 0 && failed > 0) {
         showMsg(`⚠️ تم إرسال ${success} منتج بنجاح، وحدثت مشكلة في ${failed} منتج.`, true);
     } else {
@@ -414,70 +414,104 @@ async function sendRows(rows) {
 
 function showSummaryModal(rows) {
     const modalElement = document.getElementById('summaryModal');
-    
-    // التحقق من أن النموذج صالح قبل فتح الملخص
+
     if (!validateForm()) return; 
 
     const form = document.getElementById('inventoryForm');
-    
-    // تعبئة بيانات الزيارة في الملخص
-    document.getElementById('modalRep').textContent = form.salesRep.value;
-    document.getElementById('modalCustomer').textContent = form.customer.value;
-    
-    const modalCustomerCode = document.getElementById('modalCustomerCode');
-    if (modalCustomerCode) {
-        modalCustomerCode.textContent = form.customer_code.value;
-    }
-    
-    const modalTimes = document.getElementById('modalTimes');
-    if (modalTimes) {
-         modalTimes.textContent = 
-            `${document.getElementById('visit_date').value} | دخول: ${document.getElementById('visit_time').value} - خروج: ${document.getElementById('exit_time').value}`;
-    }
 
-    // ... تعبئة جدول المنتجات والإجماليات في الـ Modal ...
-    const productsListDiv = document.getElementById('modalProductsList');
-    productsListDiv.innerHTML = `
-        <table class="table table-sm table-striped">
-            <thead>
-                <tr>
-                    <th>المنتج</th>
-                    <th>الكود</th>
-                    <th>تاريخ الانتهاء</th>
-                    <th>كرتون</th>
-                    <th>باكت</th>
-                </tr>
-            </thead>
-            <tbody id="modalProductsBody"></tbody>
-        </table>
-    `;
-    const productsBody = document.getElementById('modalProductsBody');
+    // 1. استخراج القيم الأساسية
+    const salesRep = form.salesRep.value;
+    const customerName = form.customer.value;
+    const customerCode = form.customer_code.value;
+    const governorate = form.governorate.value; 
     let totalCases = 0;
     let totalUnits = 0;
-    
+
+    // 2. تعبئة بيانات الزيارة (بشكل احترافي ومختصر)
+    document.getElementById('modalRep').textContent = salesRep;
+    document.getElementById('modalCustomer').textContent = customerName;
+
+    const visitDetailsDiv = document.getElementById('modalVisitDetails');
+    if (visitDetailsDiv) {
+        // تصميم احترافي: شريط معلومات أنيق ومختصر (التركيز على العميل)
+        visitDetailsDiv.innerHTML = `
+            <div class="d-flex justify-content-between p-2 rounded bg-light border-start border-4 border-primary shadow-sm">
+                <div class="text-start flex-fill">
+                    <strong class="text-muted small d-block">المحافظة:</strong>
+                    <span class="text-dark fw-bold">${governorate}</span>
+                </div>
+                <div class="text-end flex-fill">
+                    <strong class="text-muted small d-block">كود العميل:</strong>
+                    <span class="text-primary fw-bold">${customerCode}</span>
+                </div>
+            </div>
+        `;
+    }
+
+    // 3. تعبئة جدول المنتجات والإجماليات (الجوهرة - التركيز على الجرد)
+    const productsListDiv = document.getElementById('modalProductsList');
+
+    // تهيئة الجدول
+    productsListDiv.innerHTML = `
+        <h5 class="mt-4 mb-3 text-dark fw-bold border-bottom pb-2">تفاصيل الجرد (<span class="text-primary">${rows.length}</span> صنف)</h5>
+        
+        <div style="max-height: 450px; overflow-y: auto;">
+            <table class="table table-striped table-borderless table-sm mb-0">
+                <thead class="bg-primary text-white sticky-top shadow-sm">
+                    <tr>
+                        <th class="small py-2 rounded-start">المنتج والوصف</th>
+                        <th class="small py-2 text-center">انتهاء</th>
+                        <th class="small py-2 text-center">كرتون</th>
+                        <th class="small py-2 text-center rounded-end">باكت</th>
+                    </tr>
+                </thead>
+                <tbody id="modalProductsBody"></tbody>
+            </table>
+        </div>
+        
+        <div class="card bg-success text-white mt-3 shadow-lg border-0">
+            <div class="card-body p-3 d-flex justify-content-around align-items-center">
+                <h6 class="mb-0 fw-light border-end pe-3">إجمالي كميات الجرد:</h6>
+                <div class="text-center">
+                    <span class="d-block small text-warning">الكراتين</span>
+                    <strong style="font-size: 1.5rem;" id="modalTotalCasesSum">0</strong>
+                </div>
+                <div class="text-center">
+                    <span class="d-block small text-warning">البواكت</span>
+                    <strong style="font-size: 1.5rem;" id="modalTotalUnitsSum">0</strong>
+                </div>
+            </div>
+        </div>
+    `;
+    const productsBody = document.getElementById('modalProductsBody');
+
+    // تعبئة صفوف المنتجات
     rows.forEach(row => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td>${row.product_name}</td>
-            <td>${row.product_code}</td>
-            <td>${row.expiry_date}</td>
-            <td>${row.carton_qty}</td>
-            <td>${row.packet_qty}</td>
+            <td class="align-middle">
+                <strong>${row.product_name}</strong><br>
+                <small class="text-muted">كود: ${row.product_code} / الفئة: ${row.product_category}</small>
+            </td>
+            <td class="align-middle text-center small text-nowrap">${row.expiry_date}</td>
+            <td class="align-middle text-center fw-bold text-success">${row.carton_qty}</td>
+            <td class="align-middle text-center fw-bold text-info">${row.packet_qty}</td>
         `;
         productsBody.appendChild(tr);
         totalCases += parseInt(row.carton_qty) || 0;
         totalUnits += parseInt(row.packet_qty) || 0;
     });
 
-    document.getElementById('modalTotalProducts').textContent = rows.length;
-    document.getElementById('modalTotalCases').textContent = totalCases;
-    document.getElementById('modalTotalUnits').textContent = totalUnits;
+    // تحديث الإجماليات
+    document.getElementById('modalTotalCasesSum').textContent = totalCases;
+    document.getElementById('modalTotalUnitsSum').textContent = totalUnits;
+    document.getElementById('modalTotalProducts').textContent = rows.length; 
 
-    // فتح النافذة
+    // 4. فتح النافذة
     const modal = new bootstrap.Modal(modalElement);
     modal.show();
-    
-    // ربط زر التأكيد بالإرسال الفعلي
+
+    // 5. ربط زر التأكيد بالإرسال الفعلي
     document.getElementById('confirmSendBtn').onclick = async function() {
         modal.hide();
         await sendRows(rows);
@@ -491,13 +525,13 @@ function showSummaryModal(rows) {
 // 1. حدث الإرسال (Submit) - يسجل وقت الخروج ويفتح الملخص
 document.getElementById('inventoryForm').addEventListener('submit', async function(e){
     e.preventDefault();
-    
+
     // تسجيل الوقت الحالي للخروج فقط
     const now = new Date();
     document.getElementById('exit_time').value = formatTime(now); 
 
     if (!validateForm()) return;
-    
+
     const rows = collectRows();
     if (rows.length === 0) {
         showMsg("لا توجد منتجات صالحة للإرسال.", true);
@@ -530,20 +564,18 @@ document.getElementById('customer').addEventListener('change', function() {
 // 4. بداية التحميل (أتمتة الأوقات وتحميل البيانات)
 window.addEventListener('DOMContentLoaded', async function() {
     try {
-        // ❌ تم إزالة تسجيل الوقت هنا 
-        
         // تعبئة البيانات من ملفات JSON
         await fillSelects();
-        
+
         // إضافة أول بطاقة منتج للبدء
         if (PRODUCTS.length > 0) {
             addProductCard();
         }
-        
+
         // 🔑 ربط تسجيل وقت البدء بأول كتابة لاسم المنتج في أي بطاقة
         const productsBody = document.getElementById('productsBody');
         productsBody.addEventListener('input', recordStartTimeOnce);
-        
+
     } catch (e) {
         console.error("فشل التحميل الأولي للبيانات:", e);
     }
