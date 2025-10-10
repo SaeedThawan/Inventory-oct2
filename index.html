@@ -5,9 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>نموذج جرد ومراجعة المخزون</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css"> 
     <style>
-        /* أنماط بسيطة لرسائل التنبيه (للتوافق) */
+        /* أنماط بسيطة لرسائل التنبيه */
         .msg { padding: 10px; margin-bottom: 20px; border-radius: 5px; display: none; text-align: center; font-weight: bold; }
         .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
@@ -122,31 +121,26 @@
     <div class="modal fade" id="summaryModal" tabindex="-1" aria-labelledby="summaryModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
-          <div class="modal-header bg-primary text-white">
-            <h5 class="modal-title" id="summaryModalLabel">✅ مراجعة الجرد النهائي قبل الإرسال</h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          <div class="modal-header bg-info text-white">
+            <h5 class="modal-title" id="summaryModalLabel">تأكيد بيانات الجرد</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <div class="modal-body pb-0">
-            
-            <div class="row g-2 mb-3">
-                <div class="col-12 col-md-4">
-                    <p class="mb-1 small"><strong>المندوب:</strong> <span id="modalRep" class="text-dark"></span></p>
-                </div>
-                <div class="col-12 col-md-8">
-                    <p class="mb-1 small"><strong>العميل:</strong> <span id="modalCustomer" class="text-primary fw-bold"></span></p>
-                </div>
-            </div>
-
-            <div id="modalVisitDetails" class="mb-4">
-                </div>
-            
-            <div id="modalProductsList">
-                </div>
-            
+          <div class="modal-body">
+            <p><strong>المندوب:</strong> <span id="modalRep"></span></p>
+            <p><strong>العميل:</strong> <span id="modalCustomer"></span></p>
+            <p style="display:none;"><strong>كود العميل:</strong> <span id="modalCustomerCode"></span></p> 
+            <p><strong>التاريخ/الأوقات (آلي):</strong> <span id="modalTimes"></span></p> 
+            <hr>
+            <h6>تفاصيل المنتجات:</h6>
+            <div id="modalProductsList"></div>
+            <hr>
+            <p><strong>إجمالي المنتجات:</strong> <span id="modalTotalProducts" class="fw-bold">0</span></p>
+            <p><strong>إجمالي الكراتين:</strong> <span id="modalTotalCases" class="fw-bold">0</span></p>
+            <p><strong>إجمالي البواكت:</strong> <span id="modalTotalUnits" class="fw-bold">0</span></p>
           </div>
-          <div class="modal-footer pt-0">
+          <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء وتعديل</button>
-            <button type="button" class="btn btn-primary" id="confirmSendBtn">✅ تأكيد الإرسال</button>
+            <button type="button" class="btn btn-success" id="confirmSendBtn">✅ تأكيد الإرسال</button>
           </div>
         </div>
       </div>
